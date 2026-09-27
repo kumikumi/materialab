@@ -13,7 +13,7 @@ export default defineMaterial({
     soot: 0.35,
     streaks: 0.3,
     efflorescence: 0.12,
-    moss: 0.72,
+    moss: 0.8, // the fully mossy end of the blend: vertex paint decides how much of it shows
     mossColor: '#48581f',
     mossTips: '#7a8237',
     mossHeight: 3,

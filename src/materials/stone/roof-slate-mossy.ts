@@ -9,7 +9,7 @@ export default defineMaterial({
   description: 'The slate roof where it stays damp: moss in the joints and cushions on the butts; same seed and layout for vertex blending.',
   params: {
     ...base.params,
-    moss: 0.55,
+    moss: 0.78, // the fully mossy end of the blend
     mossColor: '#434d24',
     mossTips: '#767a42',
     mossHeight: 4,
