@@ -71,6 +71,8 @@ function fileSinkPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [fileSinkPlugin()],
+  // relative asset URLs, so the static build works under any path (e.g. GitHub Pages' /materialab/)
+  base: './',
   server: { port: 5173 },
   build: { chunkSizeWarningLimit: 1500 },
 });

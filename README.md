@@ -5,6 +5,8 @@ nine viewpoints and lighting setups at once, and exported as game-ready
 texture sets for **Godot 4** (`.tres`), **glTF 2.0** and anything else
 that takes PNG maps.
 
+Live demo here: [https://kumikumi.github.io/materialab/](https://kumikumi.github.io/materialab/)
+
 ![Wood materials](docs/gallery-wood.jpg)
 
 ```bash

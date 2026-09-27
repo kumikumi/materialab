@@ -181,6 +181,8 @@ export async function buildExport(
 /** Write files through the dev server (falls back to a .zip download). */
 export async function saveExport(id: string, files: ExportFile[]): Promise<string> {
   try {
+    // the endpoints only exist on the dev server; a static build goes straight to the download
+    if (!import.meta.env.DEV) throw new Error('static build');
     for (const f of files) {
       const r = await fetch(`/__export/${encodeURIComponent(id)}/${encodeURIComponent(f.name)}`, { method: 'POST', body: f.data as BodyInit });
       if (!r.ok) throw new Error(await r.text());
