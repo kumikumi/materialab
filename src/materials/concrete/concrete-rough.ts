@@ -1,0 +1,35 @@
+import { defineMaterial } from '../../engine/types';
+import { concreteGenerator } from '../../generators/concrete';
+
+export default defineMaterial({
+  id: 'concrete-rough',
+  name: 'Weathered concrete',
+  category: 'Concrete',
+  description: 'Old outdoor slab/wall: worn paste exposing aggregate, many air voids, stains, efflorescence and cracks.',
+  generator: concreteGenerator,
+  seed: 12,
+  params: {
+    aggColorB: '#8a847c',
+    aggColorA: '#bdb6ab',
+    color: '#9c988f',
+    mottle: 0.8,
+    mottleScale: 0.1,
+    sand: 0.8,
+    relief: 0.7,
+    waviness: 1.5,
+    aggregate: 0.45,
+    aggregateSize: 14,
+    bugholes: 3,
+    bugholeSize: 5,
+    roughness: 0.9,
+    formwork: 0,
+    panelWidth: 2,
+    panelHeight: 2,
+    panelsX: 1,
+    panelsY: 1,
+    stains: 0.7,
+    streaks: 0.4,
+    efflorescence: 0.2,
+    cracks: 0.45,
+  },
+});
