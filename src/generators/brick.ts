@@ -25,6 +25,7 @@ export const brickGenerator = defineGenerator({
     sandRelief: { type: 'float', group: 'Shape', label: 'Sand relief', default: 0.35, min: 0, max: 2, step: 0.01, unit: 'mm' },
     pits: { type: 'float', group: 'Shape', label: 'Pits', default: 0.35, min: 0, max: 1, step: 0.01 },
     dragLines: { type: 'float', group: 'Shape', label: 'Wire-cut drag', default: 0, min: 0, max: 1, step: 0.01, help: 'Horizontal tearing of wire-cut bricks' },
+    wedge: { type: 'float', group: 'Shape', label: 'Wedge', default: 0, min: 0, max: 12, step: 0.1, unit: 'mm', help: 'Units thicker at their lower edge (overlapping roof slates / shingles)' },
     // ---- brick color
     colorA: { type: 'color', group: 'Brick color', label: 'Color A', default: '#8e4a38' },
     colorB: { type: 'color', group: 'Brick color', label: 'Color B', default: '#a05a42' },
@@ -49,6 +50,10 @@ export const brickGenerator = defineGenerator({
     soot: { type: 'float', group: 'Weathering', label: 'Soot / grime', default: 0.15, min: 0, max: 1, step: 0.01 },
     efflorescence: { type: 'float', group: 'Weathering', label: 'Efflorescence', default: 0.1, min: 0, max: 1, step: 0.01 },
     streaks: { type: 'float', group: 'Weathering', label: 'Rain streaks', default: 0.1, min: 0, max: 1, step: 0.01 },
+    moss: { type: 'float', group: 'Weathering', label: 'Moss', default: 0, min: 0, max: 1, step: 0.01, help: 'Grows in joints, chips and pits first, then spreads over the faces in patches' },
+    mossColor: { type: 'color', group: 'Weathering', label: 'Moss color', default: '#4f5f26' },
+    mossTips: { type: 'color', group: 'Weathering', label: 'Moss tips', default: '#8a9139' },
+    mossHeight: { type: 'float', group: 'Weathering', label: 'Moss thickness', default: 2.5, min: 0, max: 10, step: 0.1, unit: 'mm' },
   },
   tileSize: (p) => {
     const L = n(p, 'brickLength') / 1000, H = n(p, 'brickHeight') / 1000, m = n(p, 'mortar') / 1000;
@@ -95,6 +100,7 @@ void surface(vec2 uv, inout Surface s) {
 
   // ---------------- brick height (mm)
   float face = bulge * (1.0 - 0.5 * (qn.x * qn.x + qn.y * qn.y));
+  face += wedge * (0.5 - 0.5 * qn.y);
   face += tilt * ((r2.x - 0.5) + (r2.y - 0.5) * qn.x * 0.6 + (r2.z - 0.5) * qn.y * 0.6);
   float sand = fbm2(bs / 0.0016, 3, 0.55, 12.0);
   face += sandRelief * (0.6 * sand + 0.4 * fbm2(bs / 0.006, 3, 0.5, 13.0));
@@ -167,11 +173,27 @@ void surface(vec2 uv, inout Surface s) {
     albedo *= 1.0 - streaks * 0.25 * smoothstep(0.55, 1.0, st);
   }
 
+  // ---------------- moss: cushions in the joints and damp hollows, patches over the faces
+  float mossCover = 0.0;
+  if (moss > 0.0) {
+    float patches = sat(0.5 + 1.1 * pfbm(uv, F(0.3), 5, 0.55, 40.0));
+    float tuft = 0.5 + 0.5 * pfbm(uv, F(0.003), 4, 0.6, 41.0);
+    float depth = cav;                                       // 1 in the joints, 0 on the faces
+    float damp = 0.6 * depth + 0.35 * chip + 0.35 * pit + 0.45 * patches + 0.3 * tuft - 0.1;
+    float t = 1.0 - moss;
+    mossCover = smoothstep(t - 0.07, t + 0.07, damp) * smoothstep(0.25, 0.45, tuft + 0.2 * depth);
+    vec3 mc2 = mix(mossColor, mossTips, sat(tuft * 1.4 - 0.4 + 0.3 * (patches - 0.5)));
+    mc2 *= 0.7 + 0.45 * tuft;
+    albedo = mix(albedo, mc2, mossCover);
+    rough = mix(rough, 1.0, mossCover);
+    h = mix(h, max(h, hm + mossHeight * (0.5 + 0.8 * tuft)), mossCover);
+  }
+
   s.albedo = albedo;
   s.height = h;
   s.roughness = clamp(rough, 0.0, 1.0);
   s.metallic = 0.0;
-  s.ao = 1.0 - 0.25 * pit - 0.15 * cav;
+  s.ao = (1.0 - 0.25 * pit - 0.15 * cav) * (1.0 - 0.25 * mossCover * (1.0 - 0.5 * cav));
 }
 `,
 });

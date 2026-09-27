@@ -53,9 +53,9 @@ material declares the physical size of its tile.
 | Quarter-sawn oak (ray fleck) | Old brick, Flemish bond | Carrara marble tiles | Brushed stainless steel |
 | Smoked oak herringbone | Architectural concrete (tie holes) | Nero Marquina marble | Polished steel, worn |
 | Black walnut panel | Board-formed concrete | Slate crazy paving | Hammered copper |
-| Knotty pine paneling | Weathered concrete | | Galvanized steel |
-| Curly maple (clear coat) | Painted concrete, glossy | | Aluminium tread plate |
-| Teak deck | | | Rusting painted steel |
+| Knotty pine paneling | Weathered concrete | Slate roof (+ mossy) | Galvanized steel |
+| Curly maple (clear coat) | Painted concrete, glossy | Limestone trim | Aluminium tread plate |
+| Teak deck | House brick: clean, grimy, mossy (a blend set) | | Rusting painted steel |
 | Weathered barn wood | | | |
 
 ![Masonry and concrete](docs/gallery-masonry.jpg)
@@ -86,6 +86,22 @@ anatomy is evaluated there in 3D:
 
 Cathedral arches, straight quarter-sawn grain and ray fleck aren't painted.
 They come out of the geometry.
+
+### Blend sets
+
+Games often blend several versions of one surface by vertex colour or a mask:
+clean, grimy and mossy brick, for example. The versions must share their
+layout, or the joints swim where they blend. A blend set is therefore one base
+preset plus variants that spread its parameters and change only colour and
+weathering (`brick-house-grimy.ts` is `{ ...base, params: { ...base.params,
+soot: 0.9, … } }`). Same seed, same bricks.
+
+The brick generator's weathering includes **moss**. It fills the joints,
+chips and pits first, then spreads over the faces in patches, and it raises
+the height a little, so a height-based blend can bring the cushions through
+first. **Wedge** makes each unit thicker at its lower edge, which turns the
+brick generator into overlapping roof slates (`roof-slate`). polylab's
+vertex-blended materials use these sets directly (see its `house.ts`).
 
 ## Exporting
 
